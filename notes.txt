@@ -1,0 +1,90 @@
+LECTURE - MULTI-TABLE QUERIES
+SQL FUNCTIONS, FOREIGN KEYS, JOINS, DATABASE ACCESS FUNCTIONS
+
+---------------- SQL FUNCTIONS: ------------------------------
+
+SUM:
+    EX) SELECT SUM("Quantity") AS "Total"
+        FROM "OrderDetail"
+        WHERE "ProductID" = 11;
+
+        This adds up all time times product 11 was ordered
+        The "AS "Total"" just means 'display the result in a column called "Total"'
+
+    EX) SELECT "ProductId", SUM("Quantity") AS "Total"
+        FROM "OrderDetail"
+        GROUP BY "ProductID";
+
+        This adds up all the times each different product was ordered
+
+It's better to do these functions inside the database engine rather than in JS
+    -- It's more performant, less data to send, more efficient
+    -- perform calculations in SQL then send the result back
+
+Different DBMSs have different built-in functions
+
+More SQLite functions can be found on https://www.sqlite.org/lang_corefunc.html
+
+COUNT:
+    EX) SELECT "CategoryId", COUNT("ProductName") AS "TotalProducts"
+        FROM "Product"
+        GROUP BY "CategoryId";
+
+        This returns the number of products in each category
+
+SQL Functions are pretty simple but very powerful
+
+------------------ RELATIONSHIPS: ----------------------------
+
+Primary Key (PK) = the identifier for a record
+    -- identifying column or columns
+    -- unique for each row
+
+Foreign Key (FK) = a column that points to the primary key of a row in another table
+    -- creates a link to another table
+    -- EX) ID of a category, and CategoryID in the products table
+    -- EX) BookID and AuthorID to link book to author
+    -- EX) Author Table: id (PK), name
+            Post Table: id, text, author_id (FK)
+
+    -- FKs do not need to be unique
+    -- FKs point to an identifier(PK), they are not the identifier
+
+We need to be able to query multiple tables at once in order to use FKs
+
+We can do that with JOINS
+
+JOIN: 
+    -- EX) 
+            SELECT * FROM "OrderDetail"
+            JOIN "Product" ON "OrderDetail"."ProductId" = "Product"."Id"
+            LIMIT 1;
+
+            Returns results from 2 tables so you can view all the data at once
+
+            Pulls up all orders, but shows the product details next to it as well, instead of just the order details
+
+    Joining tables often results in duplicate column names
+        -- can avoid that by specifying which columns you want
+
+    In joins, must refer to columns with "dot" notation, bc there are multiple tables
+        -- EX) Product.Id, Fruit.Color, etc 
+
+    -- EX) 
+        SELECT "OrderDetail"."Id", "OrderDetail"."Quantity", "Product"."ProductName"
+        FROM "OrderDetail"
+        JOIN "Product" ON "OrderDetail"."ProductId" = "Product"."Id"
+        LIMIT 1;
+
+        Shows three columns: order id, product quantity, product name
+        From Table 1: order id, product quantity
+        From Table 2: product name
+
+    To shorten the amount of typing we can use aliases
+        -- giving tables nicknames
+
+    -- EX) 
+            SELECT o."Id", o."Quantity", p."ProductName"
+            FROM "OrderDetail" AS o
+            JOIN "Product" AS p ON o."ProductId" = p."Id"
+            LIMIT 1;
